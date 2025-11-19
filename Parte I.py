@@ -146,7 +146,7 @@ def simulador_red_petri():
     """
     
     # DATOS PREDEFINIDOS
-    pre = [
+    """pre = [
         [1, 0, 0],  # P0
         [0, 1, 0],  # P1  
         [0, 0, 1]   # P2
@@ -156,9 +156,25 @@ def simulador_red_petri():
         [0, 0, 0],  # P0
         [1, 0, 0],  # P1
         [0, 1, 1]   # P2
+    ]"""
+
+    pre = [
+        [1,0,0,0,1],
+        [0,1,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0]
+    ]
+    post = [
+        [0,0,0,1,0],
+        [1,0,0,0,0],
+        [1,0,0,0,0],
+        [0,1,1,0,0],
+        [0,0,1,0,1]
     ]
     
-    marcado_inicial = [3, 0, 0]
+    #marcado_inicial = [3, 0, 0]
+    marcado_inicial = [1, 0, 0, 2, 1]
     
     # Crear la red de Petri
     red = RedPetri(pre, post, marcado_inicial)
