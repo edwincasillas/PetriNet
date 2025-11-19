@@ -19,7 +19,7 @@ class RedPetri:
         self.n_lugares = len(pre)
 
         # Calcular matriz de incidencia c = post - pre
-        self.c = self.calcular_matriz_incidencia()
+        self.C = self.calcular_matriz_incidencia()
 
     def calcular_matriz_incidencia(self):
         """Calcula la matriz de incidencia c = post - pre"""
@@ -29,7 +29,6 @@ class RedPetri:
             for j in range(self.n_transiciones):
                 fila.append(self.post[i][j] - self.pre[i][j])
             c.append(fila)
-        self.C = c
         return c
 
     def transiciones_habilitadas(self, marcado=None):
@@ -145,7 +144,7 @@ class RedPetri:
 
     def mostrar_estado_primero(self, mk):
         self.marcado_actual = mk
-        """Muestra el estado actual de la red"""
+        """Muestra el estado actual de la red en la primera iteración"""
         print(f"\nMarcado actual: {self.marcado_actual}")
         print(f"Transiciones habilitadas: {self.transiciones_habilitadas()}")
 
