@@ -1,136 +1,58 @@
 from Parte_I import RedPetri
 from Parte_II import GrafoCobertura
 
-def simulador_interactivo():
-    """Simulador interactivo de Red de Petri"""
-    pre = [
-        [1, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 2, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 1, 0],
-        [0, 0, 0, 0, 0, 0, 0, 1]
+
+__all__ = ["RedPetri", "GrafoCobertura", "pre", "post", "marcado_inicial"]
+
+"""pre = [
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 2, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1]
+]
+post = [
+    [0, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 2, 0]
+]
+marcado_inicial = [1, 0, 0, 1, 0, 0, 0, 0, 1]"""
+
+"""pre = [
+        [1, 0, 0, 0, 1],
+        [0, 1, 0, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 0, 1, 0],
+        [0, 0, 0, 1, 0]
     ]
     post = [
-        [0, 0, 0, 0, 1, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0],
-        [1, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0, 1],
-        [0, 0, 0, 0, 0, 0, 2, 0]
+        [0, 0, 0, 1, 0],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+        [0, 1, 1, 0, 0],
+        [0, 0, 1, 0, 1]
     ]
-    marcado_inicial = [1, 0, 0, 1, 0, 0, 0, 0, 1]
+    marcado_inicial = [1, 0, 0, 2, 1]"""
 
-    # Crear la red de Petri
-    red = RedPetri(pre, post, marcado_inicial)
-
-    print("SIMULADOR DE REDES DE PETRI")
-    print("=" * 50)
-    print(f"Matriz Pre: {pre}")
-    print(f"Matriz Post: {post}")
-    print(f"Marcado inicial: {marcado_inicial}")
-
-    # Ciclo interactivo
-    red.mostrar_estado_primero(marcado_inicial)
-    paso = 1
-    
-    while True:
-        print(f"\n--- Paso {paso} ---")
-        red.mostrar_estado()
-
-        habilitadas = red.transiciones_habilitadas()
-
-        if not habilitadas:
-            print("\n¡BLOQUEO! - No hay transiciones habilitadas")
-            break
-
-        try:
-            opcion = int(input("¿Cuál transición desea disparar? "))
-            if opcion in habilitadas:
-                exito, nuevo_marcado = red.disparar(opcion)
-                if exito:
-                    print(f"Transición {opcion} disparada exitosamente")
-                    print(f"Nuevo marcado: {nuevo_marcado}")
-                else:
-                    print(f"Error al disparar transición {opcion}")
-            else:
-                print(f"Transición {opcion} no está habilitada. Habilitadas: {habilitadas}")
-                continue
-        except ValueError:
-            print("Error: Ingrese un número válido")
-            continue
-
-        paso += 1
-
-
-
-def generar_grafo_cobertura():
-    """Genera y muestra el grafo de cobertura"""
-    pre = [
-        [1, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 2, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 1, 0],
-        [0, 0, 0, 0, 0, 0, 0, 1]
-    ]
-    post = [
-        [0, 0, 0, 0, 1, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0],
-        [1, 0, 0, 0, 0, 0, 0, 0],
-        [1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0, 1],
-        [0, 0, 0, 0, 0, 0, 2, 0]
-    ]
-    marcado_inicial = [1, 0, 0, 1, 0, 0, 0, 0, 1]
-
-    # Crear red y grafo de cobertura
-    red = RedPetri(pre, post, marcado_inicial)
-    grafo = GrafoCobertura(red)
-
-    print("GENERANDO GRAFO DE COBERTURA...")
-    
-    # Expandir grafo de cobertura
-    nodos, arcos = grafo.expandir_grafo_cobertura()
-    
-    grafo.imprimir_grafo(nodos, arcos)
-    
-    # Mostrar estadísticas
-    stats = grafo.obtener_estadisticas(nodos, arcos)
-    print("\nESTADÍSTICAS DEL GRAFO:")
-    for key, value in stats.items():
-        print(f"{key.replace('_', ' ').title()}: {value}")
-
-def main():
-    while True:
-        print("REDES DE PETRI")
-        print("1. Mostrar RP y Transiciones Habilitadas")
-        print("2. Generar Grafo de Cobertura")
-        print("3. Salir")
-        
-        opcion = input("\nSeleccione una opción: ")
-        
-        if opcion == '1':
-            simulador_interactivo()
-        elif opcion == '2':
-            generar_grafo_cobertura()
-        elif opcion == '3':
-            print("Exit...")
-            break
-        else:
-            print("Opción no válida. Intente nuevamente.")
-
-if __name__ == "__main__":
-    main()
+pre = [
+    [1, 0, 0],  # P0
+    [0, 1, 0],  # P1
+    [0, 0, 1]   # P2
+]
+post = [
+    [0, 0, 0],  # P0
+    [1, 0, 0],  # P1
+    #[0, 1, 1]   # P2 <- ESTE ES EL ERROR (no se estaba cancelando la trans de entrada a t2)
+    [0, 0, 1]
+]
+marcado_inicial = [3, 0, 0]
