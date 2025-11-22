@@ -43,15 +43,20 @@ class RedPetri:
         habilitadas = []
 
         for t in range(self.n_transiciones):
-            habilitada = True  # se puede meter en el siguiente for
+            habilitada = True 
+            arcos = False
             # Verificar M >= Pre para todos los lugares
             # Verifica que las transiciones tienen que ser iguales o mayores en los absolutos, y diferentes de 0 para
             # para que se encuentren habilitadas
             for p in range(self.n_lugares):
-                if self.pre[p][t] > marcado[p] or (abs(self.C[p][t]) != self.pre[p][t] and abs(self.C[p][t]) == 0):
+                # if self.pre[p][t] > marcado[p]:
+                if self.pre[p][t] > 0 or self.post[p][t] > 0: # toma en cuenta el pre y post
+                    arcos = True
+                if self.pre[p][t] > marcado[p]:
                     habilitada = False
                     break
-            if habilitada:
+            if habilitada and arcos: # se habilita si existen arcos
+            #if habilitada:
                 habilitadas.append(t)
 
         return habilitadas
@@ -77,7 +82,8 @@ class RedPetri:
         # Calcular nuevo marcado: M' = M + c[:,t]
         nuevo_marcado = marcado.copy()
         for p in range(self.n_lugares):
-            nuevo_marcado[p] = marcado[p] + self.c[p][transicion]
+            #nuevo_marcado[p] = marcado[p] + self.C[p][transicion]
+            nuevo_marcado[p] += self.C[p][transicion]
 
         # Actualizar marcado actual si no se proporcionó uno específico
         if marcado == self.marcado_actual:
@@ -154,7 +160,7 @@ def simulador_red_petri():
     Simulador de Red de Petri con búsqueda por anchura
     """
     # DATOS PREDEFINIDOS
-    pre = [
+    """pre = [
         [1, 0, 0],  # P0
         [0, 1, 0],  # P1
         [0, 0, 1]   # P2
@@ -162,8 +168,9 @@ def simulador_red_petri():
     post = [
         [0, 0, 0],  # P0
         [1, 0, 0],  # P1
-        [0, 1, 1]   # P2
-    ]
+        #[0, 1, 1]   # P2 <- ESTE ES EL ERROR (no se estaba cancelando la trans de entrada a t2)
+        [0, 0, 1]
+    ]"""
     marcado_inicial = [3, 0, 0]
 
     """pre = [
@@ -182,7 +189,7 @@ def simulador_red_petri():
     ]
     marcado_inicial = [1, 0, 0, 2, 1]"""
 
-    """
+    
     pre = [
         [1, 0, 0, 0, 0, 0, 0, 0],
         [1, 0, 0, 0, 0, 0, 0, 0],
@@ -190,7 +197,7 @@ def simulador_red_petri():
         [0, 0, 1, 0, 0, 0, 0, 0],
         [0, 0, 0, 1, 0, 0, 0, 0],
         [0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 2, 0, 0, 0], # este marcage bloquea la red por la parte izquierda, necesitamos 2 tokens en a inicialmente para poder habilitar la trans 4
         [0, 0, 0, 0, 0, 1, 1, 0],
         [0, 0, 0, 0, 0, 0, 0, 1]
     ]
@@ -203,10 +210,10 @@ def simulador_red_petri():
         [0, 0, 1, 0, 0, 0, 0, 0],
         [0, 0, 0, 1, 0, 0, 0, 0],
         [0, 0, 0, 1, 0, 0, 0, 1],
-        [0, 0, 0, 0, 0, 0, 1, 0]
+        [0, 0, 0, 0, 0, 0, 2, 0]
     ]
-    marcado_inicial = [1, 0, 0, 0, 0, 0, 0, 0, 1]
-    """
+    marcado_inicial = [1, 0, 0, 1, 0, 0, 0, 0, 1]
+    
 
     # Crear la red de Petri
     red = RedPetri(pre, post, marcado_inicial)
@@ -215,7 +222,7 @@ def simulador_red_petri():
     print("Datos predefinidos:")
     print(f"Matriz Pre: {pre}")
     print(f"Matriz Post: {post}")
-    print(f"Matriz Incidencia (c): {red.c}")
+    print(f"Matriz Incidencia (c): {red.C}")
     print(f"Marcado inicial: {marcado_inicial}")
 
     # Realizar búsqueda por anchura
@@ -280,7 +287,7 @@ def ejemplo_red_simple():
     print("="*50)
     print(f"Pre: {pre}")
     print(f"Post: {post}")
-    print(f"Matriz c: {red.c}")
+    print(f"Matriz c: {red.C}")
     print(f"Marcado inicial: {marcado_inicial}")
 
     # Búsqueda por anchura
