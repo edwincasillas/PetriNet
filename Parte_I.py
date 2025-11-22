@@ -15,9 +15,19 @@ class RedPetri:
         self.marcado_inicial = marcado_inicial.copy()
         self.n_transiciones = len(pre[0])
         self.n_lugares = len(pre)
+        self.omega = "ω"
 
         # Calcular matriz de incidencia c = post - pre
         self.C = self.calcular_matriz_incidencia()
+
+    def es_omega(self, valor):
+        return valor == "ω"
+    
+    def comparar_con_omega(self, pre_condicion, marca):
+        if self.es_omega(marca):
+            return True
+        else:
+            return marca >= pre_condicion
 
     def calcular_matriz_incidencia(self):
         """Calcula la matriz de incidencia c = post - pre"""
@@ -50,7 +60,8 @@ class RedPetri:
                 # if self.pre[p][t] > marcado[p]:
                 if self.pre[p][t] > 0 or self.post[p][t] > 0: # toma en cuenta el pre y post
                     arcos = True
-                if self.pre[p][t] > marcado[p]:
+                #if self.pre[p][t] > marcado[p]:
+                if not self.comparar_con_omega(self.pre[p][t], marcado[p]):
                     habilitada = False
                     break
             if habilitada and arcos: # se habilita si existen arcos
@@ -79,7 +90,13 @@ class RedPetri:
         nuevo_marcado = marcado.copy()
         for p in range(self.n_lugares):
             #nuevo_marcado[p] = marcado[p] + self.C[p][transicion]
-            nuevo_marcado[p] += self.C[p][transicion]
+            #nuevo_marcado[p] += self.C[p][transicion]
+            if self.es_omega(marcado[p]):
+                nuevo_marcado[p] = 'ω'
+            else:
+                nuevo_marcado[p] += self.C[p][transicion]
+                if nuevo_marcado[p] < 0:
+                    nuevo_marcado[p] = 0
 
         # Actualizar marcado actual si no se proporcionó uno específico
         if marcado == self.marcado_actual:
