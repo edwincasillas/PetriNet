@@ -130,8 +130,8 @@ def simulador_red_petri():
         [1, 0, 0],  # P1
         #[0, 1, 1]   # P2 <- ESTE ES EL ERROR (no se estaba cancelando la trans de entrada a t2)
         [0, 0, 1]
-    ]"""
-    marcado_inicial = [3, 0, 0]
+    ]
+    marcado_inicial = [3, 0, 0]"""
 
     """pre = [
         [1, 0, 0, 0, 1],
