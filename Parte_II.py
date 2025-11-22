@@ -145,10 +145,14 @@ class GrafoCobertura:
             
             for marcado_r_tuple in camino_n0_a_nk:
                 marcado_r = list(marcado_r_tuple)
-                
-                # Verificar si μ_r(pi) < μ_k(pi) y μ_k(pi) < μ_z_base(pi)
-                condicion1 = self.comparar_marcas(marcado_r[pi], marcado_k[pi]) == -1
-                condicion2 = self.comparar_marcas(marcado_k[pi], marcado_z_base[pi]) == -1
+
+                if (not self.es_omega(marcado_r[pi]) and 
+                    not self.es_omega(marcado_k[pi]) and 
+                    not self.es_omega(marcado_z_base[pi])):
+
+                    # Verificar si μ_r(pi) < μ_k(pi) y μ_k(pi) < μ_z_base(pi)
+                    condicion1 = self.comparar_marcas(marcado_r[pi], marcado_k[pi]) == -1
+                    condicion2 = self.comparar_marcas(marcado_k[pi], marcado_z_base[pi]) == -1
                 
                 if condicion1 and condicion2:
                     existe_nr_con_condicion = True
