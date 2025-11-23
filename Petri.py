@@ -1,6 +1,5 @@
 from __init__ import *
-import graphviz
-
+import  dibuja_red
 
 def salir(ans):
     """
@@ -80,6 +79,7 @@ def generar_grafo_cobertura():
     nodos, arcos = grafo.expandir_grafo_cobertura()
 
     grafo.imprimir_grafo(nodos, arcos)
+    dibuja_red.dibuja_GC(nodos, arcos)
 
     # Mostrar estadísticas
     stats = grafo.obtener_estadisticas(nodos, arcos)
@@ -89,6 +89,7 @@ def generar_grafo_cobertura():
 
 
 def main():
+    dibuja_red.dibuja_RP(pre, post, marcado_inicial)
     while True:
         print("REDES DE PETRI")
         print("1. Mostrar RP y Transiciones Habilitadas")

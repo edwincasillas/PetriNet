@@ -58,7 +58,6 @@ class RedPetri:
             # Verifica que las transiciones tienen que ser iguales o mayores en los absolutos, y diferentes de 0 para
             # para que se encuentren habilitadas
             for p in range(self.n_lugares):
-                # if self.pre[p][t] > marcado[p]:
                 if self.pre[p][t] > 0 or self.post[p][t] > 0: # toma en cuenta el pre y post
                     arcos = True
                 if self.cobertura is False and self.pre[p][t] > marcado[p]:
