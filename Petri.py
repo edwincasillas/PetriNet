@@ -1,4 +1,5 @@
 from __init__ import *
+import graphviz
 
 
 def salir(ans):
