@@ -8,6 +8,7 @@ class GrafoCobertura:
         """
         self.red = red_petri
         self.omega = 'ω'  # Representación simbólica de omega
+        self.red.cobertura = True
     
     def es_omega(self, valor):
         """Verifica si un valor representa omega"""

@@ -16,6 +16,7 @@ class RedPetri:
         self.n_transiciones = len(pre[0])
         self.n_lugares = len(pre)
         self.omega = "ω"
+        self.cobertura = False
 
         # Calcular matriz de incidencia c = post - pre
         self.C = self.calcular_matriz_incidencia()
@@ -60,12 +61,13 @@ class RedPetri:
                 # if self.pre[p][t] > marcado[p]:
                 if self.pre[p][t] > 0 or self.post[p][t] > 0: # toma en cuenta el pre y post
                     arcos = True
-                #if self.pre[p][t] > marcado[p]:
-                if not self.comparar_con_omega(self.pre[p][t], marcado[p]):
+                if self.cobertura is False and self.pre[p][t] > marcado[p]:
+                    habilitada = False
+                    break
+                elif self.cobertura is True and not self.comparar_con_omega(self.pre[p][t], marcado[p]):
                     habilitada = False
                     break
             if habilitada and arcos: # se habilita si existen arcos
-            #if habilitada:
                 habilitadas.append(t)
 
         return habilitadas
@@ -89,22 +91,73 @@ class RedPetri:
         # Calcular nuevo marcado: M' = M + c[:,t]
         nuevo_marcado = marcado.copy()
         for p in range(self.n_lugares):
-            #nuevo_marcado[p] = marcado[p] + self.C[p][transicion]
-            #nuevo_marcado[p] += self.C[p][transicion]
-            if self.es_omega(marcado[p]):
-                nuevo_marcado[p] = 'ω'
-            else:
+            if self.cobertura is False:
                 nuevo_marcado[p] += self.C[p][transicion]
-                if nuevo_marcado[p] < 0:
-                    nuevo_marcado[p] = 0
+            else:
+                if self.es_omega(marcado[p]):
+                    nuevo_marcado[p] = 'ω'
+                else:
+                    nuevo_marcado[p] += self.C[p][transicion]
+                    if nuevo_marcado[p] < 0:
+                        nuevo_marcado[p] = 0
 
         # Actualizar marcado actual si no se proporcionó uno específico
         if marcado == self.marcado_actual:
             self.marcado_actual = nuevo_marcado
 
         return True, nuevo_marcado
+    
+    def busqueda_por_anchura(self, max_profundidad=10):
+        """
+        Realiza búsqueda por anchura en el árbol de alcance
 
+        Returns:
+            dict: Diccionario con todos los marcados alcanzables
+        """
+        # Usar tupla para poder usar como clave en diccionario
+        marcado_inicial_tuple = tuple(self.marcado_inicial)
 
+        visitados = {}  # marcado -> {padre: None, transicion: None}
+        cola = deque()
+
+        # Inicializar con el marcado inicial
+        visitados[marcado_inicial_tuple] = {'padre': None, 'transicion': None}
+        cola.append((marcado_inicial_tuple, 0))  # (marcado, profundidad)
+
+        while cola:
+            marcado_actual_tuple, profundidad = cola.popleft()
+            marcado_actual = list(marcado_actual_tuple)
+
+            if profundidad >= max_profundidad:
+                continue
+
+            # Obtener transiciones habilitadas para este marcado
+            habilitadas = self.transiciones_habilitadas(marcado_actual)
+
+            for transicion in habilitadas:
+                # Disparar transición
+                exito, nuevo_marcado = self.disparar(transicion, marcado_actual)
+
+                if exito:
+                    nuevo_marcado_tuple = tuple(nuevo_marcado)
+                    # Si es un nuevo marcado, agregar a la cola
+                    if nuevo_marcado_tuple not in visitados:
+                        visitados[nuevo_marcado_tuple] = {
+                            'padre': marcado_actual_tuple,
+                            'transicion': transicion
+                        }
+                        cola.append((nuevo_marcado_tuple, profundidad + 1))
+
+        return visitados
+
+    def mostrar_arbol_alcance(self, arbol):
+        """Muestra el árbol de alcance encontrado por BFS"""
+        print("ÁRBOL DE ALCANCE - BÚSQUEDA POR ANCHURA")
+
+        for i, (marcado, info) in enumerate(arbol.items()):
+            padre_str = f"Padre: {info['padre']}" if info['padre'] else "INICIAL"
+            transicion_str = f"Transición: T{info['transicion']}" if info['transicion'] is not None else ""
+            print(f"M{i}: {marcado} | {padre_str} | {transicion_str}")
 
     def mostrar_estado(self):
         """Muestra el estado actual de la red"""
@@ -120,18 +173,18 @@ class RedPetri:
 
 def simulador_red_petri():
     # DATOS PREDEFINIDOS
-    """pre = [
+    pre = [
         [1, 0, 0],  # P0
         [0, 1, 0],  # P1
-        [0, 0, 1]   # P2
+        [0, 0, 0]   # P2
     ]
     post = [
         [0, 0, 0],  # P0
         [1, 0, 0],  # P1
         #[0, 1, 1]   # P2 <- ESTE ES EL ERROR (no se estaba cancelando la trans de entrada a t2)
-        [0, 0, 1]
+        [0, 1, 0]
     ]
-    marcado_inicial = [3, 0, 0]"""
+    marcado_inicial = [3, 0, 0]
 
     """pre = [
         [1, 0, 0, 0, 1],
@@ -150,7 +203,7 @@ def simulador_red_petri():
     marcado_inicial = [1, 0, 0, 2, 1]"""
 
     
-    pre = [
+    """pre = [
         [1, 0, 0, 0, 0, 0, 0, 0],
         [1, 0, 0, 0, 0, 0, 0, 0],
         [0, 1, 0, 0, 0, 0, 0, 0],
@@ -172,7 +225,7 @@ def simulador_red_petri():
         [0, 0, 0, 1, 0, 0, 0, 1],
         [0, 0, 0, 0, 0, 0, 2, 0]
     ]
-    marcado_inicial = [1, 0, 0, 1, 0, 0, 0, 0, 1]
+    marcado_inicial = [1, 0, 0, 1, 0, 0, 0, 0, 1]"""
     
 
     # Crear la red de Petri
@@ -184,6 +237,10 @@ def simulador_red_petri():
     print(f"Matriz Post: {post}")
     print(f"Matriz Incidencia (c): {red.C}")
     print(f"Marcado inicial: {marcado_inicial}")
+
+    print("\nRealizando búsqueda por anchura...")
+    arbol_alcance = red.busqueda_por_anchura()
+    red.mostrar_arbol_alcance(arbol_alcance)
 
     # Ciclo interactivo de simulación
     print("MODO INTERACTIVO")

@@ -16,11 +16,17 @@ def simulador_interactivo():
     # Crear la red de Petri
     red = RedPetri(pre, post, marcado_inicial)
 
+    print("=" * 50)
     print("SIMULADOR DE REDES DE PETRI")
     print("=" * 50)
     print(f"Matriz Pre: {pre}")
     print(f"Matriz Post: {post}")
+    print(f"Matriz de incidencia: {red.C}")
     print(f"Marcado inicial: {marcado_inicial}")
+
+    print("\nRealizando búsqueda por anchura...")
+    arbol_alcance = red.busqueda_por_anchura()
+    red.mostrar_arbol_alcance(arbol_alcance)
 
     # Ciclo interactivo
     red.mostrar_estado_primero(marcado_inicial)
@@ -64,6 +70,9 @@ def generar_grafo_cobertura():
     red = RedPetri(pre, post, marcado_inicial)
     grafo = GrafoCobertura(red)
 
+    print("=" * 50)
+    print("GRAFO DE COBERTURA")
+    print("=" * 50)
     print("GENERANDO GRAFO DE COBERTURA...")
 
     # Expandir grafo de cobertura
@@ -76,6 +85,7 @@ def generar_grafo_cobertura():
     print("\nESTADÍSTICAS DEL GRAFO:")
     for key, value in stats.items():
         print(f"{key.replace('_', ' ').title()}: {value}")
+
 
 def main():
     while True:
@@ -95,6 +105,7 @@ def main():
             break
         else:
             print("Opción no válida. Intente nuevamente.")
+
 
 if __name__ == "__main__":
     main()

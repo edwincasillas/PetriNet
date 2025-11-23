@@ -47,12 +47,12 @@ marcado_inicial = [1, 0, 0, 1, 0, 0, 0, 0, 1]"""
 pre = [
     [1, 0, 0],  # P0
     [0, 1, 0],  # P1
-    [0, 0, 1]   # P2
+    [0, 0, 0]   # P2
 ]
 post = [
     [0, 0, 0],  # P0
     [1, 0, 0],  # P1
-    #[0, 1, 1]   # P2 <- ESTE ES EL ERROR (no se estaba cancelando la trans de entrada a t2)
-    [0, 0, 1]
+    [0, 1, 0]   # P2
+    #[0, 0, 1]
 ]
 marcado_inicial = [3, 0, 0]
