@@ -8,6 +8,7 @@ class GrafoCobertura:
         """
         self.red = red_petri
         self.omega = 'ω'  # Representación simbólica de omega
+        self.red.cobertura = True
     
     def es_omega(self, valor):
         """Verifica si un valor representa omega"""
@@ -141,25 +142,23 @@ class GrafoCobertura:
             
             # Regla 2: Si existe n_r en el camino de n_0 a n_k con μ_r(pi) < μ_k(pi)
             # y μ_k(pi) < μ_z_base(pi), entonces μ_z(pi) = ω
-            existe_nr_con_condicion = False
-            
-            for marcado_r_tuple in camino_n0_a_nk:
-                marcado_r = list(marcado_r_tuple)
 
-                if (not self.es_omega(marcado_r[pi]) and 
-                    not self.es_omega(marcado_k[pi]) and 
-                    not self.es_omega(marcado_z_base[pi])):
-
-                    # Verificar si μ_r(pi) < μ_k(pi) y μ_k(pi) < μ_z_base(pi)
-                    condicion1 = self.comparar_marcas(marcado_r[pi], marcado_k[pi]) == -1
-                    condicion2 = self.comparar_marcas(marcado_k[pi], marcado_z_base[pi]) == -1
-                
-                if condicion1 and condicion2:
-                    existe_nr_con_condicion = True
-                    break
+            # verifica crecimiento μ_k(pi) < μ_z_base(pi) solo si μ_z_base(pi) es finito
+            crecimiento = (not self.es_omega(marcado_z_base[pi]) and
+                           self.comparar_marcas(marcado_k[pi], nuevo_marcado[pi]) == -1)
+            if crecimiento:
+                existe_nr_con_condicion = False
             
-            if existe_nr_con_condicion:
-                nuevo_marcado[pi] = self.omega
+                # itera sobre los predecesores, excluye el ultimo elemento μ_k
+                for marcado_r_tuple in camino_n0_a_nk[:-1]:
+                    marcado_r = list(marcado_r_tuple)
+
+                    if (not self.es_omega(marcado_r[pi]) and
+                        self.comparar_marcas(marcado_r[pi], marcado_k[pi]) <= 0):
+                        existe_nr_con_condicion = True
+                        break
+                if existe_nr_con_condicion:
+                    nuevo_marcado[pi] = self.omega
         
         return nuevo_marcado
     

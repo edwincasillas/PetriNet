@@ -1,0 +1,21 @@
+// Grafo de Cobertura
+digraph CoverageGraph {
+	graph [rankdir=LR splines=true]
+	"(3, 0, 0)" [label="[3, 0, 0]" color=black shape=oval style=""]
+	"(2, 1, 0)" [label="[2, 1, 0]" color=black shape=oval style=""]
+	"(1, 'ω', 0)" [label="[1, ω, 0]" color=red shape=oval style=""]
+	"(2, 0, 'ω')" [label="[2, 0, ω]" color=red shape=oval style=""]
+	"(0, 'ω', 0)" [label="[0, ω, 0]" color=red shape=oval style=""]
+	"(1, 'ω', 'ω')" [label="[1, ω, ω]" color=red shape=oval style=""]
+	"(0, 'ω', 'ω')" [label="[0, ω, ω]" color=red shape=oval style=""]
+	"(3, 0, 0)" -> "(2, 1, 0)" [label=T0]
+	"(2, 1, 0)" -> "(1, 'ω', 0)" [label=T0]
+	"(2, 1, 0)" -> "(2, 0, 'ω')" [label=T1]
+	"(1, 'ω', 0)" -> "(0, 'ω', 0)" [label=T0]
+	"(1, 'ω', 0)" -> "(1, 'ω', 'ω')" [label=T1]
+	"(2, 0, 'ω')" -> "(1, 'ω', 'ω')" [label=T0]
+	"(0, 'ω', 0)" -> "(0, 'ω', 'ω')" [label=T1]
+	"(1, 'ω', 'ω')" -> "(0, 'ω', 'ω')" [label=T0]
+	"(1, 'ω', 'ω')" -> "(1, 'ω', 'ω')" [label=T1]
+	"(0, 'ω', 'ω')" -> "(0, 'ω', 'ω')" [label=T1]
+}

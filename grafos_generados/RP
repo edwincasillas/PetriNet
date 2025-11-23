@@ -1,0 +1,17 @@
+// Red de Petri
+digraph PetriNet {
+	graph [rankdir=TB splines=true]
+	P0 [label="P0
+(3)" color=green shape=circle]
+	P1 [label="P1
+(0)" color=black shape=circle]
+	P2 [label="P2
+(0)" color=black shape=circle]
+	T0 [label=T0 height=0.5 shape=box width=0.1]
+	T1 [label=T1 height=0.5 shape=box width=0.1]
+	T2 [label=T2 height=0.5 shape=box width=0.1]
+	P0 -> T0 [label=""]
+	P1 -> T1 [label=""]
+	T0 -> P1 [label=""]
+	T1 -> P2 [label=""]
+}
