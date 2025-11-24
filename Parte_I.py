@@ -53,20 +53,17 @@ class RedPetri:
 
         for t in range(self.n_transiciones):
             habilitada = True 
-            arcos = False
             # Verificar M >= Pre para todos los lugares
             # Verifica que las transiciones tienen que ser iguales o mayores en los absolutos, y diferentes de 0 para
             # para que se encuentren habilitadas
             for p in range(self.n_lugares):
-                if self.pre[p][t] > 0 or self.post[p][t] > 0: # toma en cuenta el pre y post
-                    arcos = True
                 if self.cobertura is False and self.pre[p][t] > marcado[p]:
                     habilitada = False
                     break
                 elif self.cobertura is True and not self.comparar_con_omega(self.pre[p][t], marcado[p]):
                     habilitada = False
                     break
-            if habilitada and arcos: # se habilita si existen arcos
+            if habilitada: # se habilita si existen arcos
                 habilitadas.append(t)
 
         return habilitadas

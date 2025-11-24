@@ -74,7 +74,10 @@ def dibuja_GC(nodos, arcos, imagen="GC"):
     directorio()
     dot = graphviz.Digraph('CoverageGraph',
                            comment='Grafo de Cobertura',
-                           graph_attr={'rankdir': 'LR', 'splines': 'true'})
+                           graph_attr={'rankdir': 'LR',
+                                       'splines': 'true'})
+
+    marcado_inicial_tuple = next(iter(nodos.keys()))
     
     # Agregar Nodos (Marcados)
     for marcado, info in nodos.items():
@@ -88,7 +91,9 @@ def dibuja_GC(nodos, arcos, imagen="GC"):
         color = 'black'
         shape = 'oval'
 
-        if 'ω' in marcado:
+        if marcado == marcado_inicial_tuple:
+            color = 'green'
+        elif 'ω' in marcado:
             color = 'red'
         elif info['tipo'] == 'terminal':
             shape = 'doublecircle'

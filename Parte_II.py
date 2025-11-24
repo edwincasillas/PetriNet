@@ -154,7 +154,7 @@ class GrafoCobertura:
                     marcado_r = list(marcado_r_tuple)
 
                     if (not self.es_omega(marcado_r[pi]) and
-                        self.comparar_marcas(marcado_r[pi], marcado_k[pi]) <= 0):
+                        self.comparar_marcas(marcado_r[pi], marcado_k[pi]) <= -1):
                         existe_nr_con_condicion = True
                         break
                 if existe_nr_con_condicion:
