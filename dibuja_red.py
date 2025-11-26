@@ -1,9 +1,7 @@
 import graphviz
 import os
 
-
 output_directory = "grafos_generados"
-
 
 def directorio():
     if not os.path.exists(output_directory):
@@ -35,7 +33,7 @@ def dibuja_RP(pre, post, Mk, imagen="RP"):
                 # fontcolor='green' if Mk[i] > 0 else 'black')
 
     # agrega las transiciones
-    for i in range(n_lugares):
+    for i in range(n_trans):
         trans_id = f"T{i}"
         # ls transiciones son cajas delgadas
         dot.node(trans_id,
@@ -91,6 +89,7 @@ def dibuja_GC(nodos, arcos, imagen="GC"):
         if 'ω' in marcado:
             color = 'red'
         elif info['tipo'] == 'terminal':
+            color = 'blue'
             shape = 'doublecircle'
         elif info['tipo'] == 'duplicado':
             shape = 'box'

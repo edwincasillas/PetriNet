@@ -131,6 +131,7 @@ class GrafoCobertura:
         Aplica las reglas del grafo de cobertura para determinar el marcado final
         """
         nuevo_marcado = marcado_z_base.copy()
+        quitar_x = False
         
         for i in range(len(marcado_k)):
             pi = i  # índice del lugar
@@ -144,21 +145,29 @@ class GrafoCobertura:
             # y μ_k(pi) < μ_z_base(pi), entonces μ_z(pi) = ω
 
             # verifica crecimiento μ_k(pi) < μ_z_base(pi) solo si μ_z_base(pi) es finito
-            crecimiento = (not self.es_omega(marcado_z_base[pi]) and
-                           self.comparar_marcas(marcado_k[pi], nuevo_marcado[pi]) == -1)
-            if crecimiento:
+            if (not self.es_omega(marcado_z_base[pi]) and
+                self.comparar_marcas(marcado_k[pi], nuevo_marcado[pi]) == -1):
                 existe_nr_con_condicion = False
             
                 # itera sobre los predecesores, excluye el ultimo elemento μ_k
+                if not camino_n0_a_nk[:-1]:
+                    existe_nr_con_condicion = True
                 for marcado_r_tuple in camino_n0_a_nk[:-1]:
                     marcado_r = list(marcado_r_tuple)
-
                     if (not self.es_omega(marcado_r[pi]) and
-                        self.comparar_marcas(marcado_r[pi], marcado_k[pi]) <= 0):
+                        self.comparar_marcas(marcado_r[pi], marcado_k[pi]) == -1):
                         existe_nr_con_condicion = True
                         break
                 if existe_nr_con_condicion:
-                    nuevo_marcado[pi] = self.omega
+                    nuevo_marcado[pi] = 'x'
+            elif (not self.es_omega(marcado_z_base[pi]) and
+                self.comparar_marcas(marcado_k[pi], nuevo_marcado[pi]) == 1):
+                quitar_x = True
+                break
+        if quitar_x:
+            nuevo_marcado = [b if a == 'x' else a for a, b in zip(nuevo_marcado, marcado_z_base)]
+        else:
+            nuevo_marcado = list(map(lambda e: self.omega if e == 'x' else e, nuevo_marcado))
         
         return nuevo_marcado
     

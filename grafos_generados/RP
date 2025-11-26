@@ -2,16 +2,49 @@
 digraph PetriNet {
 	graph [rankdir=TB splines=true]
 	P0 [label="P0
-(3)" color=green shape=circle]
+(1)" color=green shape=circle]
 	P1 [label="P1
 (0)" color=black shape=circle]
 	P2 [label="P2
 (0)" color=black shape=circle]
+	P3 [label="P3
+(1)" color=green shape=circle]
+	P4 [label="P4
+(0)" color=black shape=circle]
+	P5 [label="P5
+(0)" color=black shape=circle]
+	P6 [label="P6
+(0)" color=black shape=circle]
+	P7 [label="P7
+(0)" color=black shape=circle]
+	P8 [label="P8
+(1)" color=green shape=circle]
 	T0 [label=T0 height=0.5 shape=box width=0.1]
 	T1 [label=T1 height=0.5 shape=box width=0.1]
 	T2 [label=T2 height=0.5 shape=box width=0.1]
+	T3 [label=T3 height=0.5 shape=box width=0.1]
+	T4 [label=T4 height=0.5 shape=box width=0.1]
+	T5 [label=T5 height=0.5 shape=box width=0.1]
+	T6 [label=T6 height=0.5 shape=box width=0.1]
+	T7 [label=T7 height=0.5 shape=box width=0.1]
 	P0 -> T0 [label=""]
-	P1 -> T1 [label=""]
-	T0 -> P1 [label=""]
-	T1 -> P2 [label=""]
+	P1 -> T0 [label=""]
+	P2 -> T1 [label=""]
+	P3 -> T2 [label=""]
+	P4 -> T3 [label=""]
+	P5 -> T3 [label=""]
+	P6 -> T4 [label=2]
+	P7 -> T5 [label=""]
+	P7 -> T6 [label=""]
+	P8 -> T7 [label=""]
+	T4 -> P0 [label=""]
+	T5 -> P1 [label=""]
+	T0 -> P2 [label=""]
+	T0 -> P3 [label=""]
+	T1 -> P4 [label=""]
+	T2 -> P5 [label=""]
+	T3 -> P6 [label=""]
+	T3 -> P7 [label=""]
+	T7 -> P7 [label=""]
+	T6 -> P8 [label=2]
 }
