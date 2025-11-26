@@ -1,8 +1,9 @@
 from Parte_I import RedPetri
 from Parte_II import GrafoCobertura
+from Parte_III import Analysis
 
 
-__all__ = ["RedPetri", "GrafoCobertura", "pre", "post", "marcado_inicial"]
+__all__ = ["RedPetri", "GrafoCobertura", "Analysis", "pre", "post", "marcado_inicial"]
 
 """pre = [
     [1, 0, 0, 0, 0, 0, 0, 0],
@@ -85,14 +86,27 @@ marcado_inicial = [1, 0, 0, 1, 0, 0, 0, 0, 1]"""
 # ]
 # marcado_inicial = [1, 0, 0]
 
-pre = [
-    [1, 0],  # P0
-    [0, 1],  # P1
-    [1, 0]   # P2
-]
-post = [
-    [1, 0],  # P0
-    [1, 0],  # P1
-    [0, 1]   # P2
-]
-marcado_inicial = [1, 0, 2]
+# pre = [
+#     [1, 0],  # P0
+#     [0, 1],  # P1
+#     [1, 0]   # P2
+# ]
+# post = [
+#     [1, 0],  # P0
+#     [1, 0],  # P1
+#     [0, 1]   # P2
+# ]
+# marcado_inicial = [1, 0, 2]
+
+# pre = [
+#     [1, 0, 0],  # P0
+#     [0, 1, 0],  # P1
+#     [0, 0, 1]   # P2
+# ]
+# post = [
+#     [0, 0, 1],  # P0
+#     [1, 0, 0],  # P1
+#     [0, 1, 0]   # P2
+#     #[0, 0, 1]
+# ]
+# marcado_inicial = [3, 0, 0] # solo cumple con vivacidad, [1,0,0] cumple las 3

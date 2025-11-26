@@ -87,10 +87,39 @@ def generar_grafo_cobertura():
     for key, value in stats.items():
         print(f"{key.replace('_', ' ').title()}: {value}")
 
+    """PARTE 3, ANALISIS"""
+    print("\n")
+    print("=" * 50)
+    print("ANALISIS DEL GRAFO")
+    print("=" * 50)
+
+    # Propiedad de acotamiento
+    if stats['nodos_con_omega'] > 0:
+        print('ACOTAMIENTO: ❌ (hay presencia de ω)')
+    else:
+        print('ACOTAMIENTO: ✅')
+        cota_max = 0
+        for marcado in nodos.keys():
+            cota_max = max(cota_max, * [m for m in marcado if isinstance(m, int)])
+        print(f"La cota maxima es {cota_max}")
+    analiza_grafo(nodos, arcos)
+
+
+def analiza_grafo(nodos, arcos):
+    """
+    Realiza el analisis del grafo
+    """
+    red = RedPetri(pre, post, marcado_inicial)
+    analisis = Analysis(red)
+
+    analisis.reversibilidad(nodos, arcos)
+    analisis.vivacidad(nodos, arcos)
+
 
 def main():
     dibuja_red.dibuja_RP(pre, post, marcado_inicial)
     while True:
+        print("\n")
         print("REDES DE PETRI")
         print("1. Mostrar RP y Transiciones Habilitadas")
         print("2. Generar Grafo de Cobertura")
@@ -103,7 +132,6 @@ def main():
         elif opcion == '2':
             generar_grafo_cobertura()
         elif opcion == '3':
-            print("Exit...")
             break
         else:
             print("Opción no válida. Intente nuevamente.")
