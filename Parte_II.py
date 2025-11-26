@@ -130,9 +130,10 @@ class GrafoCobertura:
         """
         Aplica las reglas del grafo de cobertura para determinar el marcado final
         """
+        """
         nuevo_marcado = marcado_z_base.copy()
         quitar_x = False
-        
+
         for i in range(len(marcado_k)):
             pi = i  # índice del lugar
             
@@ -150,25 +151,52 @@ class GrafoCobertura:
                 existe_nr_con_condicion = False
             
                 # itera sobre los predecesores, excluye el ultimo elemento μ_k
-                if not camino_n0_a_nk[:-1]:
-                    existe_nr_con_condicion = True
                 for marcado_r_tuple in camino_n0_a_nk[:-1]:
                     marcado_r = list(marcado_r_tuple)
                     if (not self.es_omega(marcado_r[pi]) and
                         self.comparar_marcas(marcado_r[pi], marcado_k[pi]) == -1):
                         existe_nr_con_condicion = True
                         break
+                if not camino_n0_a_nk[:-1]:
+                    existe_nr_con_condicion = True
                 if existe_nr_con_condicion:
                     nuevo_marcado[pi] = 'x'
             elif (not self.es_omega(marcado_z_base[pi]) and
                 self.comparar_marcas(marcado_k[pi], nuevo_marcado[pi]) == 1):
                 quitar_x = True
                 break
+        print("con X" + str(nuevo_marcado))
         if quitar_x:
             nuevo_marcado = [b if a == 'x' else a for a, b in zip(nuevo_marcado, marcado_z_base)]
         else:
             nuevo_marcado = list(map(lambda e: self.omega if e == 'x' else e, nuevo_marcado))
-        
+        """
+        # Comparar siempre el nuevo marcado
+        nuevo_marcado = marcado_z_base.copy()
+        for pi in range(len(marcado_k)):
+            if self.es_omega(marcado_k[pi]):
+                nuevo_marcado[pi] = self.omega
+
+        for marcado_r_tuple in camino_n0_a_nk:
+            cambio = False
+            diff = []
+            marcado_r = list(marcado_r_tuple)
+
+            # Verificar cambios en cada posicion
+            for r_pi, z_pi in zip(marcado_r, nuevo_marcado):
+                if self.es_omega(z_pi) or r_pi == z_pi:
+                    diff.append(False)
+                elif r_pi < z_pi:
+                    cambio = True
+                    diff.append(True)
+                elif r_pi > z_pi:
+                    cambio = False
+                    break
+            
+            if cambio:
+                nuevo_marcado = [self.omega if a else b for a, b in zip(diff, nuevo_marcado)]
+                break
+
         return nuevo_marcado
     
     def imprimir_grafo(self, nodos, arcos):

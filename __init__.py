@@ -5,7 +5,7 @@ from Parte_III import Analysis
 
 __all__ = ["RedPetri", "GrafoCobertura", "Analysis", "pre", "post", "marcado_inicial"]
 
-"""pre = [
+pre = [
     [1, 0, 0, 0, 0, 0, 0, 0],
     [1, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 0, 0, 0, 0, 0, 0],
@@ -27,7 +27,7 @@ post = [
     [0, 0, 0, 1, 0, 0, 0, 1],
     [0, 0, 0, 0, 0, 0, 2, 0]
 ]
-marcado_inicial = [1, 0, 0, 1, 0, 0, 0, 0, 1]"""
+marcado_inicial = [1, 0, 0, 1, 0, 0, 0, 0, 1]
 
 """pre = [
         [1, 0, 0, 0, 1],
