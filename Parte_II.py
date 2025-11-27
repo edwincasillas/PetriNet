@@ -220,7 +220,7 @@ class GrafoCobertura:
 
     def obtener_estadisticas(self, nodos, arcos):
         """Obtiene estadísticas del grafo de cobertura"""
-        estadisticas = {
+        """estadisticas = {
             'total_nodos': len(nodos),
             'nodos_expandidos': 0,
             'nodos_frontera': 0,
@@ -235,6 +235,39 @@ class GrafoCobertura:
             tipo = info['tipo']
             if tipo in estadisticas:
                 estadisticas[f'nodos_{tipo}'] += 1
+            
+            # Contar nodos que contienen al menos un omega
+            if any(self.es_omega(x) for x in marcado):
+                estadisticas['nodos_con_omega'] += 1
+        
+        return estadisticas"""
+        estadisticas = {
+            'total_nodos': len(nodos),
+            'nodos_expandidos': 0,
+            'nodos_frontera': 0,
+            'nodos_terminales': 0,
+            'nodos_duplicados': 0,
+            'nodos_profundidad_maxima': 0,
+            'total_arcos': len(arcos),
+            'nodos_con_omega': 0
+        }
+        
+        # Mapeo de tipos para contar correctamente
+        mapeo_tipos = {
+            'expandido': 'nodos_expandidos',
+            'frontera': 'nodos_frontera', 
+            'terminal': 'nodos_terminales',
+            'duplicado': 'nodos_duplicados',
+            'profundidad_maxima': 'nodos_profundidad_maxima'
+        }
+        
+        for marcado, info in nodos.items():
+            tipo = info['tipo']
+            
+            # Contar por tipo usando el mapeo
+            if tipo in mapeo_tipos:
+                clave_estadistica = mapeo_tipos[tipo]
+                estadisticas[clave_estadistica] += 1
             
             # Contar nodos que contienen al menos un omega
             if any(self.es_omega(x) for x in marcado):

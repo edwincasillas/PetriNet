@@ -84,8 +84,16 @@ def generar_grafo_cobertura():
     # Mostrar estadísticas
     stats = grafo.obtener_estadisticas(nodos, arcos)
     print("\nESTADÍSTICAS DEL GRAFO:")
-    for key, value in stats.items():
-        print(f"{key.replace('_', ' ').title()}: {value}")
+    """for key, value in stats.items():
+        print(f"{key.replace('_', ' ').title()}: {value}")"""
+    print(f"Total de nodos: {stats['total_nodos']}")
+    print(f"Total de arcos: {stats['total_arcos']}")
+    print(f"Nodos con ω: {stats['nodos_con_omega']}")
+    print(f"Nodos expandidos: {stats['nodos_expandidos']}")
+    print(f"Nodos frontera: {stats['nodos_frontera']}")
+    print(f"Nodos terminales: {stats['nodos_terminales']}")
+    print(f"Nodos duplicados: {stats['nodos_duplicados']}")
+    print(f"Nodos con profundidad máxima: {stats['nodos_profundidad_maxima']}")
 
     """PARTE 3, ANALISIS"""
     print("\n")
