@@ -14,7 +14,7 @@ class Analysis:
         self.on_stack[u] = True  # esta el nodo en la pila?
 
         for v in adyacencia.get(u, set()):
-            if v not in self.ids or self.ids[v] == -1:
+            if v not in self.ids:
                 # Vecino no visitado
                 self._tarjan(v, adyacencia)
                 self.low[u] = min(self.low[u], self.low[v])
@@ -25,7 +25,7 @@ class Analysis:
         # Si el ID de descubrimiento es igual al low-link, se encontro un CFC.
         if self.ids[u] == self.low[u]:
             scc = []
-            while self.stack:
+            while True:
                 node = self.stack.pop()
                 self.on_stack[node] = False
                 scc.append(node)
@@ -33,21 +33,24 @@ class Analysis:
                     break
             self.sccs.append(scc)
     
-    def es_alcanzable(self, grafo_arcos_inverso, inicio, destino):
+    def es_alcanzable(self, grafo_adyacencia, inicio, destino):
         """
         Verifica si el destino es alcanzable desde el inicio BFS
         """
         cola = deque([inicio])
         visitados = {inicio}
 
+        if inicio == destino:
+            return True
+
         while cola:
             actual = cola.popleft()
             if actual == destino:
                 return True
 
-            # Recorre los vecinos (los arcos del grafo invertido)
-            if actual in grafo_arcos_inverso:
-                for vecino in grafo_arcos_inverso[actual]:
+            # Recorre los vecinos
+            if actual in grafo_adyacencia:
+                for vecino in grafo_adyacencia[actual]:
                     if vecino not in visitados:
                         visitados.add(vecino)
                         cola.append(vecino)
@@ -75,13 +78,10 @@ class Analysis:
         M0 = tuple(self.red.marcado_inicial)
 
         # diccionario para almacenar el grafo invertido (destino -> lista de origenes)
-        grafo_inverso = {nodo: set() for nodo in nodos.keys()}
+        grafo_adyacencia = {nodo: set() for nodo in nodos.keys()}
 
         for arco in arcos:
-            origen = arco['origen']
-            destino = arco['destino']
-            # el destino del arco original (arco['destino']) es el inicio del arco inverso
-            grafo_inverso[destino].add(origen)
+            grafo_adyacencia[arco['origen']].add(arco['destino'])
 
         # verifica el regreso a M0 desde cada nodo alcanzable
         es_reversible = True
@@ -91,10 +91,6 @@ class Analysis:
             # si Mk es M0, es alcanzable.
             if Mk == M0:
                 continue
-
-            grafo_adyacencia = {nodo: set() for nodo in nodos.keys()}
-            for arco in arcos:
-                grafo_adyacencia[arco['origen']].add(arco['destino'])
 
             if not self.es_alcanzable(grafo_adyacencia, Mk, M0):
                 print(f"Fallo la reversibilidad: No se puede regresar a M0 desde {list(Mk)}")
@@ -109,26 +105,116 @@ class Analysis:
         
         return es_reversible
 
-    def vivacidad(self, nodos=None, arcos=None):
+    def verificacion_vivacidad(self, nodos=None, arcos=None):
         """
         Verifica si la red es viva mediante tarjan.
 
         La RP es viva si y solo si el subgrafo del grafo de alcanzabilidad que consiste en
         la unión de todas las CFC es fuertemente conexo y cubre todas las transiciones.
         """
-        if nodos is None or arcos is None:
-            nodos, arcos = self.grafo_cobertura.expandir_grafo_cobertura()
+        n_transiciones = self.red.n_transiciones
+        todas_transiciones = set(range(n_transiciones))
+        grafo_adyacencia = {}
 
-        # Verifica nodos terminales (deadlocks)
-        for _ , info in nodos.items():
-            if info['tipo'] == 'terminal':
-                print("\nVIVACIDAD: ❌ NO VIVA (Existe nodo terminal/deadlock).")
-                return False
-
-        # construye grafo de adyacencia
-        graph_adj = {nodo: set() for nodo in nodos.keys()}
+        #construccion del grafo de ady
+        for nodo in nodos.keys():
+            grafo_adyacencia[nodo] = set()
         for arco in arcos:
-            graph_adj[arco['origen']].add(arco['destino'])
+            grafo_adyacencia[arco['origen']].add(arco['destino'])
+        
+        # verifica que las transiciones se pueden disparar
+        trans_disp = set()
+        trans_no_disp = set()
+
+        for trans in range(n_transiciones):
+            disp = True
+            counter = 0
+            max_count = 3
+
+            # verifica que para cada nodo hay un nodo que habilite alguna trans
+            for nodo_actual in nodos.keys():
+                existe_camino = False # verifica que existe un camino que habilite la transicion
+                # bfs para encontrar existencia
+                cola = deque([nodo_actual])
+                visitados = {nodo_actual}
+
+                while cola and not existe_camino:
+                    nodo = cola.popleft()
+
+                    # verifica que el marcado habilite la trans
+                    marcado_mk = list(nodo)
+                    habilitadas = self.red.transiciones_habilitadas(marcado_mk)
+                    if trans in habilitadas:
+                        existe_camino = True
+                        break
+
+                    # expandir vecions
+                    if nodo in grafo_adyacencia:
+                        for vecino in grafo_adyacencia[nodo]:
+                            if vecino not in visitados:
+                                visitados.add(vecino)
+                                cola.append(vecino)
+
+                if not existe_camino:
+                    disp = False
+                    if counter < max_count:
+                        print(f" Desde el {nodo_actual} no se puede habilitar T{trans}")
+                        counter += 1
+
+            if disp:
+                print(f"  ✅ T{trans} es VIVA")
+                trans_disp.add(trans)
+            else:
+                print(f"  ❌ T{trans} NO es viva")
+                trans_disp.add(trans)
+
+        if not trans_no_disp:
+            print("✅ TODAS las transiciones son VIVAS")
+            print("VIVACIDAD: ✅ VIVA")
+            return True
+        else:
+            print(f"❌ Transiciones NO vivas: {sorted(trans_disp)}")
+            print(f"✅ Transiciones vivas: {sorted(trans_disp)}")
+            print("VIVACIDAD: ❌ NO VIVA")
+            return False
+
+    def analysis_vivacidad(self, nodos, arcos):
+        """
+        Analizza las causas de no vivacidad
+        
+        :param self: obj
+        :param nodos: nodos del grafo de cobertura
+        :param arcos: arcos de disparo de transiciones
+        """
+         # verifica deadlocks (nodos terminales)
+        nodos_terminales = [marcado for marcado, info in nodos.items() if info['tipo'] == 'terminal']
+
+        if nodos_terminales:
+            print(f"❌ Se encontraron {len(nodos_terminales)} nodos terminales (deadlocks):")
+            for nodo in nodos_terminales[:3]:  # muetra solo 3
+                print(f"   - {nodo}")
+        
+        # verifica transiciones nunca habilitadas
+        trans_hab_some_nodo = set()
+
+        for nodo in nodos.keys():
+            lista_marcaje = list(nodo)
+            habilitadas = self.red.transiciones_habilitadas(lista_marcaje)
+            trans_hab_some_nodo.update(habilitadas)
+
+        todas_transiciones = set(range(self.red.n_transiciones))
+        transiciones_nunca_habilitadas = todas_transiciones - trans_hab_some_nodo
+
+        if transiciones_nunca_habilitadas:
+            print(f"❌ Transiciones NUNCA habilitadas: {sorted(transiciones_nunca_habilitadas)}")
+
+        # componentes fuertemente conexas
+        print("\n--- Análisis de Componentes Fuertemente Conexas ---")
+        grafo_adyacencia = {}
+        for nodo in nodos.keys():
+            grafo_adyacencia[nodo] = set()
+        for arco in arcos:
+            grafo_adyacencia[arco['origen']].add(arco['destino'])
 
         # inicializa estructuras de Tarjan
         self.ids = {} # almacena el ID de descubrimiento de cada nodo.
@@ -140,44 +226,85 @@ class Analysis:
 
         # inicializa todos los nodos como no visitados
         for node in nodos.keys():
-            self.ids[node] = -1
-            self.low[node] = -1
             self.on_stack[node] = False
 
         for node in nodos.keys():
-            if self.ids[node] == -1:
-                self._tarjan(node, graph_adj)
+            if node not in self.ids:
+                self._tarjan(node, grafo_adyacencia)
 
         # verifica la vivacidad en la red
-        node_to_scc = {}
-        for scc in self.sccs:
-            # Convertimos la lista de CFC a una tupla de tuplas, o simplemente la usamos como identificador.
-            # Aquí, usaremos la primera tupla de la CFC como identificador para simplificar.
-            scc_identifier = tuple(sorted(scc))
-            for node in scc:
-                node_to_scc[node] = scc_identifier
-        
-        # 3. VERIFICACIÓN DE CICLOS Y COBERTURA DE TRANSICIONES
-        
-        n_transiciones = self.red.n_transiciones
-        todas_las_transiciones = set(range(n_transiciones))
-        transiciones_cfc = set()
+        print(f"Se encontraron {len(self.sccs)} componentes fuertemente conexas: ")
 
-        # recorre los arcos verificando si el origen y destino estan en el SCC
+        for i, scc in enumerate(self.sccs):
+            print(f"  CFC {i + 1}: {len(scc)} nodos")
+            if len(scc) == 1:
+                nodo = scc[0]
+                # verificamos si es terminal
+                if nodo in nodos and nodos[nodo]['tipo'] == 'terminal':
+                    print(f"      CFC trivial con nodo terminal: {nodo}")
+        
+        # identificacion de cfc sin salidas a otras cfc
+        cfc_terminal = []
+
+        for i, scc in enumerate(self.sccs):
+            es_terminal = True
+            for nodo in scc:
+                if nodo in grafo_adyacencia:
+                    for vecino in grafo_adyacencia[nodo]:
+                        if vecino not in scc:
+                            es_terminal = False
+                            break
+                if not es_terminal:
+                    break
+            if es_terminal:
+                cfc_terminal.append(scc)
+                print(f"  CFC {i+1} es TERMINAL (sin salida a otras CFCs)")
+
+        return {'nodos_terminales': nodos_terminales,
+                'transiciones_nunca_habilitadas': transiciones_nunca_habilitadas,
+                'cfc_terminales': cfc_terminal,
+                'total_cfc': len(self.sccs)}
+        
+    def vivacidad(self, nodos=None, arcos=None):
+        """
+        Verificacion de vivacidad con multiples metodos
+        
+        :param self: Description
+        :param nodos: Description
+        :param arcos: Description
+        """
+        resultado_estructural = self.analysis_vivacidad(nodos, arcos)
+        if resultado_estructural['nodos_terminales']:
+            print("\n❌ VIVACIDAD: NO VIVA (se detectaron nodos terminales)")
+            return False
+        if resultado_estructural['transiciones_nunca_habilitadas']:
+            print("\n❌ VIVACIDAD: NO VIVA (hay transiciones nunca habilitadas)")
+            return False
+        
+        # Construir mapeo de nodo a CFC
+        nodo_a_cfc = {}
+        for i, scc in enumerate(self.sccs):
+            for nodo in scc:
+                nodo_a_cfc[nodo] = i
+
+        # Verificar que cada transicion aparece en al menos un ciclo
+        transiciones_en_ciclos = set()
         for arco in arcos:
             origen = arco['origen']
             destino = arco['destino']
             transicion = arco['transicion']
-            scc_origen_id = node_to_scc.get(origen)
-            scc_destino_id = node_to_scc.get(destino)
-            if scc_origen_id is not None and scc_origen_id == scc_destino_id:
-                transiciones_cfc.add(transicion)
 
-        # todas las transiciones pueden participar en un ciclo?
-        if transiciones_cfc == todas_las_transiciones:
-            print(f"\nVIVACIDAD: ✅ VIVA (Todas las transiciones T{list(todas_las_transiciones)} estan en un ciclo/CFC).")
+            if origen in nodo_a_cfc and destino in nodo_a_cfc:
+                if nodo_a_cfc[origen] == nodo_a_cfc[destino]:
+                    transiciones_en_ciclos.add(transicion)
+
+        todas_transiciones = set(range(self.red.n_transiciones))
+        if transiciones_en_ciclos == todas_transiciones:
+            print("✅ Todas las transiciones participan en ciclos")
+            print("✅ VIVACIDAD: VIVA (por analisis de CFCs)")
             return True
         else:
-            transiciones_faltantes = todas_las_transiciones - transiciones_cfc
-            print(f"\nVIVACIDAD: ❌ NO VIVA (Faltan transiciones {list(transiciones_faltantes)} en los ciclos).")
-            return False
+            transiciones_faltantes = todas_transiciones - transiciones_en_ciclos
+            print(f"❌ Transiciones que no participan en ciclos: {sorted(transiciones_faltantes)}")
+
+        return self.verificar_vivacidad_completa(nodos, arcos)

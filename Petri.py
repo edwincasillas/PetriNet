@@ -94,7 +94,8 @@ def generar_grafo_cobertura():
     print("=" * 50)
 
     # Propiedad de acotamiento
-    if stats['nodos_con_omega'] > 0:
+    es_acotada = stats['nodos_con_omega'] == 0
+    if not es_acotada:
         print('ACOTAMIENTO: ❌ (hay presencia de ω)')
     else:
         print('ACOTAMIENTO: ✅')
@@ -102,18 +103,25 @@ def generar_grafo_cobertura():
         for marcado in nodos.keys():
             cota_max = max(cota_max, * [m for m in marcado if isinstance(m, int)])
         print(f"La cota maxima es {cota_max}")
-    analiza_grafo(nodos, arcos)
+    analiza_grafo(nodos, arcos, es_acotada)
 
 
-def analiza_grafo(nodos, arcos):
+def analiza_grafo(nodos, arcos, acotamiento):
     """
     Realiza el analisis del grafo
     """
     red = RedPetri(pre, post, marcado_inicial)
     analisis = Analysis(red)
 
-    analisis.reversibilidad(nodos, arcos)
-    analisis.vivacidad(nodos, arcos)
+    es_reversible = analisis.reversibilidad(nodos, arcos)
+    es_viva = analisis.vivacidad(nodos, arcos)
+
+    print("\n" + "="*50)
+    print("RESUMEN FINAL DE PROPIEDADES")
+    print("="*50)
+    print(f"Acotamiento: {'✅ ACOTADA' if acotamiento else '❌ NO ACOTADA'}")
+    print(f"Reversibilidad: {'✅ REVERSIBLE' if es_reversible else '❌ NO REVERSIBLE'}")
+    print(f"Vivacidad: {'✅ VIVA' if es_viva else '❌ NO VIVA'}")
 
 
 def main():

@@ -1,6 +1,6 @@
 // Red de Petri
 digraph PetriNet {
-	graph [rankdir=TB splines=true]
+	graph [rankdir=TB splines=false]
 	P0 [label="P0
 (1)" color=green shape=circle]
 	P1 [label="P1
