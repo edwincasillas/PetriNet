@@ -236,7 +236,7 @@ class Analysis:
         print(f"Se encontraron {len(self.sccs)} componentes fuertemente conexas: ")
 
         for i, scc in enumerate(self.sccs):
-            print(f"  CFC {i + 1}: {len(scc)} nodos")
+            print(f"  CFC {i + 1}: {len(scc)} nodos --> {scc}")
             if len(scc) == 1:
                 nodo = scc[0]
                 # verificamos si es terminal
@@ -275,7 +275,7 @@ class Analysis:
         """
         resultado_estructural = self.analysis_vivacidad(nodos, arcos)
         if resultado_estructural['nodos_terminales']:
-            print("\n❌ VIVACIDAD: NO VIVA (se detectaron nodos terminales)")
+            print("\n❌ VIVACIDAD: NO VIVA (la CFC final no contiene todas las transiciones/existe mas de una CFC)")
             return False
         if resultado_estructural['transiciones_nunca_habilitadas']:
             print("\n❌ VIVACIDAD: NO VIVA (hay transiciones nunca habilitadas)")
@@ -300,11 +300,11 @@ class Analysis:
 
         todas_transiciones = set(range(self.red.n_transiciones))
         if transiciones_en_ciclos == todas_transiciones:
-            print("✅ Todas las transiciones participan en ciclos")
+            print("✅ Todas las transiciones son parte de la misma CFC")
             print("✅ VIVACIDAD: VIVA (por analisis de CFCs)")
             return True
         else:
             transiciones_faltantes = todas_transiciones - transiciones_en_ciclos
-            print(f"❌ Transiciones que no participan en ciclos: {sorted(transiciones_faltantes)}")
+            print(f"❌ Transiciones que no participan en las componentes: {sorted(transiciones_faltantes)}")
 
-        return self.verificar_vivacidad_completa(nodos, arcos)
+        return False
