@@ -18,7 +18,7 @@ def dibuja_RP(pre, post, Mk, imagen="RP"):
 
     dot = graphviz.Digraph('PetriNet',
                            comment='Red de Petri',
-                           graph_attr={'rankdir': 'TB', 'splines': 'true'})
+                           graph_attr={'rankdir': 'TB', 'splines': 'false'})
     
     for i in range(n_lugares):
         # agrega nodos
@@ -73,7 +73,7 @@ def dibuja_GC(nodos, arcos, imagen="GC"):
     dot = graphviz.Digraph('CoverageGraph',
                            comment='Grafo de Cobertura',
                            graph_attr={'rankdir': 'LR',
-                                       'splines': 'true'})
+                                       'splines': 'false'})
 
     marcado_inicial_tuple = next(iter(nodos.keys()))
     
